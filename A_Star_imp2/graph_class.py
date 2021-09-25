@@ -6,7 +6,7 @@ from queue import PriorityQueue
 
 class Graph():
     def __init__(self, length, width, start_node, end_node):
-        self.node_state_hash = {'@': 0b1110, '$': 0b1101, '*': 0b1100, 'S': 0b10, 'G': 0b11, '.': 0b0, '#': 0b1, u'↘': 0b100, u'→': 0b101, u'↗': 0b110, u'↑': 0b111, u'↖': 0b1000, u'←': 0b1001, u'↙': 0b1010, u'↓': 0b1011}
+        self.node_state_hash = {'$': 0b1110, '^': 0b1101, '-': 0b1100, 'S': 0b10, 'G': 0b11, '.': 0b0, '#': 0b1, u'↘': 0b100, u'→': 0b101, u'↗': 0b110, u'↑': 0b111, u'↖': 0b1000, u'←': 0b1001, u'↙': 0b1010, u'↓': 0b1011}
         self.inverse_node_hash = self.hash_to_inverse(self.node_state_hash)
 
         self.l = length
@@ -193,7 +193,7 @@ class Graph():
 
             grid_state = self.get_grid()
 
-            os.system('cls')
+            os.system('clear')
             print(grid_state)
             # time.sleep(0.1)
 
@@ -228,7 +228,7 @@ class Graph():
             open_set_hash.remove(current_node)
 
             if (current_node[1], current_node[0]) == self.ending_node:
-                print(self.reconstruct_path(came_from))
+                print(self.reconstruct_path(came_from, current_node))
                 return True # reconstruct path
             
             for neighbor in self.get_neighbors(current_node):
@@ -247,7 +247,7 @@ class Graph():
 
                         self.open_node(neighbor)
 
-            os.system('cls')
+            os.system('clear')
             grid = self.get_grid()
             print(grid)
 
@@ -256,22 +256,29 @@ class Graph():
 
         return False
 
-    def reconstruct_path(self, came_from):
-        path = list(came_from.keys())
-        path.reverse()
+    def reconstruct_path(self, came_from, curr_node):
+        print(curr_node)
+        print(came_from)
+        path = []
+        while curr_node in came_from:
+            curr_node = came_from[curr_node]
+            path.append(curr_node)
+            # self.grid[curr_node[1]][curr_node[0]] = self.node_state_hash['@']
 
         for i in range(len(path)):
-            self.update_board([path[i]], self.node_state_hash['@'])
-            
-            os.system('cls')
+            self.update_board([path[i]], self.node_state_hash['$'])
+            self.update_board([self.starting_node], self.node_state_hash['S'])
+            self.update_board([self.ending_node], self.node_state_hash['G'])
+
             grid = self.get_grid()
+            os.system('clear')
             print(grid)
 
     def open_node(self, coords):
-        self.grid[coords[1]][coords[0]] = self.node_state_hash['$']  
+        self.grid[coords[1]][coords[0]] = self.node_state_hash['^']  
 
     def close_node(self, coords):
-        self.grid[coords[1]][coords[0]] = self.node_state_hash['*']     
+        self.grid[coords[1]][coords[0]] = self.node_state_hash['-']     
 
     def hash_to_inverse(self, hashmap):
         keys = list(hashmap.keys())
@@ -281,8 +288,6 @@ class Graph():
         for i in range(len(vals)):
             inverse_hashmap.update({vals[i]: keys[i]})
 
-        print(inverse_hashmap)
-        
         return inverse_hashmap
     
     def get_node_state(self, coords):
