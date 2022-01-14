@@ -1,0 +1,52 @@
+x_p = [1, 2, 3, 4, 5]
+y_p = [1, 2, 3, 4, 5]
+
+
+# Calculating theta and phi values
+phi_list = [((x + 1) * math.pi / 2) for x in x_p]
+theta_list = [((x + 1) * math.pi / 2) for x in y_p]
+
+# Create a 2 qubit QuantumRegister - two for the vectors, and 
+# one for the ancillary qubit
+qreg = QuantumRegister(3, 'qreg')
+
+# Create a one bit ClassicalRegister to hold the result
+# of the measurements
+creg = ClassicalRegister(1, 'creg')
+
+qc = QuantumCircuit(qreg, creg, name='qc')
+
+# Get backend using the Aer provider
+backend = Aer.get_backend('qasm_simulator')
+
+# Create list to hold the results
+results_list = []
+
+# Estimating distances from the new point to the centroids
+for i in range(1, 4):
+    # Apply a Hadamard to the ancillary
+    qc.h(qreg[2])
+
+    # Encode new point and centroid
+    qc.u3(theta_list[0], phi_list[0], 0, qreg[0])           
+    qc.u3(theta_list[i], phi_list[i], 0, qreg[1]) 
+
+    # Perform controlled swap
+    qc.cswap(qreg[2], qreg[0], qreg[1])
+    # Apply second Hadamard to ancillary
+    qc.h(qreg[2])
+
+    # Measure ancillary
+    qc.measure(qreg[2], creg[0])
+
+    # Reset qubits
+    qc.reset(qreg)
+
+    # Register and execute job
+    job = execute(qc, backend=backend, shots=1024)
+    result = job.result().get_counts(qc)
+    print(qc)
+    print(result)
+    results_list.append(result['1'])
+
+print(results_list)

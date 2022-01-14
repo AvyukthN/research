@@ -9,14 +9,14 @@ if __name__ == '__main__':
 
     grid = graph.get_grid()
 
-    print(grid)
+    # print(grid)
 
     graph.wall_generation(generation_state='random', num_walls=5)
     # graph.wall_generation(generation_state='custom', num_walls=5, coords=[[(10, 10), 10, 5]])
 
     grid = graph.get_grid()
 
-    print(grid)
+    # print(grid)
 
     # path = graph.greedy_heuristic_alg(heuristic_type='euclidian')
     # print(path)

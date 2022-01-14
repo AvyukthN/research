@@ -193,7 +193,7 @@ class Graph():
 
             grid_state = self.get_grid()
 
-            os.system('clear')
+            os.system('cls')
             print(grid_state)
             # time.sleep(0.1)
 
@@ -228,7 +228,7 @@ class Graph():
             open_set_hash.remove(current_node)
 
             if (current_node[1], current_node[0]) == self.ending_node:
-                print(self.reconstruct_path(came_from, current_node))
+                self.reconstruct_path(came_from, current_node)
                 return True # reconstruct path
             
             for neighbor in self.get_neighbors(current_node):
@@ -247,7 +247,7 @@ class Graph():
 
                         self.open_node(neighbor)
 
-            os.system('clear')
+            os.system('cls')
             grid = self.get_grid()
             print(grid)
 
@@ -257,8 +257,8 @@ class Graph():
         return False
 
     def reconstruct_path(self, came_from, curr_node):
-        print(curr_node)
-        print(came_from)
+        # print(curr_node)
+        # print(came_from)
         path = []
         while curr_node in came_from:
             curr_node = came_from[curr_node]
@@ -271,7 +271,7 @@ class Graph():
             self.update_board([self.ending_node], self.node_state_hash['G'])
 
             grid = self.get_grid()
-            os.system('clear')
+            os.system('cls')
             print(grid)
 
     def open_node(self, coords):
