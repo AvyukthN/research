@@ -3,48 +3,62 @@ from qiskit import QuantumCircuit
 from qiskit import Aer, execute
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 ''''''
 
-pts = np.array([[1, 1], [3, 3], [4, 4], [2, 2]])
-x = pts[:, 0]
-y = pts[:, 1]
+c_2538 = 0
+c_10055 = 0
+c_310 = 0
 
-print(list(x))
-print(list(y))
+iters = 1
 
-qreg = QuantumRegister(3, 'qreg')
-creg = ClassicalRegister(1, 'creg')
-qc = QuantumCircuit(qreg, creg, name='qc')
+for j in range(iters):
+    pts = np.array([[1, 1], [25, 38], [100, 55], [3, 10]])
+    x = pts[:, 0]
+    y = pts[:, 1]
 
-backend = Aer.get_backend('qasm_simulator')
+    qreg = QuantumRegister(3, 'qreg')
+    creg = ClassicalRegister(1, 'creg')
+    qc = QuantumCircuit(qreg, creg, name='qc')
 
-phi_vec = [(c + 1) * (math.pi/2) for c in list(x)]
-theta_vec = [(c + 1) * (math.pi/2) for c in list(y)]
+    backend = Aer.get_backend('qasm_simulator')
 
-results_list = []
+    phi_vec = [(c + 1) * (math.pi/2) for c in list(x)]
+    theta_vec = [(c + 1) * (math.pi/2) for c in list(y)]
 
-for i in range(1, 4):
-    qc.h(qreg[2])
+    results_list = []
 
-    qc.u3(theta_vec[0], phi_vec[0], 0, qreg[0])           
-    qc.u3(theta_vec[i], phi_vec[i], 0, qreg[1]) 
+    for i in range(1, 4):
+        qc.h(qreg[2])
 
-    qc.cswap(qreg[2], qreg[0], qreg[1])
-    qc.h(qreg[2])
+        qc.u3(theta_vec[0], phi_vec[0], 0, qreg[0])
+        qc.u3(theta_vec[i], phi_vec[i], 0, qreg[1]) 
 
-    qc.measure(qreg[2], creg[0])
+        qc.cswap(qreg[2], qreg[0], qreg[1])
+        qc.h(qreg[2])
 
-    qc.reset(qreg)
+        qc.measure(qreg[2], creg[0])
+         
+        if i == 1:
+            print(qc)
 
-    job = execute(qc, backend=backend, shots=2048)
-    result = job.result().get_counts(qc)
-    print(result)
-    results_list.append(result['1'])
+        qc.reset(qreg)
 
-print(results_list)
+        job = execute(qc, backend=backend, shots=2048)
+        result = job.result().get_counts(qc)
+        results_list.append(result['1'])
 
-classes = ['33', '44', '22']
-pred = classes[results_list.index(min(results_list))]
+    classes = ['25-38', '100-55', '3-10']
+    pred = classes[results_list.index(min(results_list))]
 
-print(pred)
+    if pred == '25-38':
+        c_2538 += 1
+    if pred == '100-55':
+        c_10055 += 1
+    if pred == '3-10':
+        c_310 += 1
+
+plt.bar(["c_2538", "c_10055", "c_310"], [c_2538, c_10055, c_310])
+plt.savefig('./preds.png')
+plt.show()
